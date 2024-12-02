@@ -13,7 +13,7 @@ $ git clone https://github.com/RyanNgCT/SeqPDFDowner.git
 $ pip install -r requirements.txt
 ```
 
-3. Configure your `BASE_URL` and copy your user `COOKIE` into a `.env` file.
+3. Configure your `BASE_URL` and copy your user `COOKIE` (if any) into a `.env` file.
 
 A base url would look something like: `https://download[.]me/example-`, given pdfs to download like:
 ```

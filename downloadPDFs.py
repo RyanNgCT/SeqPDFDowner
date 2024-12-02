@@ -13,7 +13,7 @@ def getVars() -> tuple[str, str]:
     return base_url, cookie
 
 
-def recursivePDFDownload(base_url: str, cookie: str, naming: str, start: int, stop: int):
+def recursivePDFDownload(base_url: str, cookie: str, naming: str, start: int, stop: int) -> str:
     """
     Download PDFs in incremental order.
         - base_url <str>: Base URL of the PDFs to download.
@@ -60,7 +60,8 @@ def recursivePDFDownload(base_url: str, cookie: str, naming: str, start: int, st
             status_dict[i] = line_to_print
             success_count += 1
 
-    with open('out.log', 'w') as f:
+    with open(os.path.join(download_dir + '/out.log'), 'w') as f:
+        f.write('SeqPDFDowner by RyanNgCT (2024)\n')
         f.write(f'{success_count} files successfully downloaded.\n')
         if fail_count > 0:
             f.write(f'{fail_count} files not downloaded!\n')
@@ -69,13 +70,14 @@ def recursivePDFDownload(base_url: str, cookie: str, naming: str, start: int, st
             f.write(f'[{key}] {val}\n')
         f.write('\nOperation Complete.')
 
+    return "Done."
 
-def testConnection(base_url: str, cookie: str, start: int) -> bool:
+
+def testConnection(full_url: str, cookie: str) -> bool:
     """
     Tests connection to the supposed first pdf uri endpoint
         - base_url <str>: Base URL of the PDFs to download.
         - cookie <str>: User cookie obtained from the getVars() method.
-        - start <int>: First index of PDFs to download.
     """
 
     if cookie:
@@ -91,20 +93,19 @@ def testConnection(base_url: str, cookie: str, start: int) -> bool:
         }
 
     try:
-        start = f'{start:02}' # might need to modify accordingly
-        response = requests.get(f'{base_url}{start}.pdf', headers=headers, timeout=10)
+        response = requests.get(f'{full_url}', headers=headers, timeout=10)
         response.raise_for_status()
 
         # successful endpoint response
         if response.status_code == 200 or response.status_code == 201:
+            print("[+} Test Connection Successful.")
             return True
         else:
             print('An error occurred trying to connect to the server')
             return False
         
     except Exception as e:
-        print(f'An exception occurred: {e}')
-        raise
+        sys.exit(f'An exception occurred: \n{e}\nPlease re-verify the url.')
 
 def hashFile(file_path: str):
     hasher = hashlib.sha256()
@@ -128,7 +129,8 @@ if __name__ == '__main__':
     except ValueError:
         sys.exit("Invalid input. Run the program again!")
     else:
-        naming = input("Enter a prefix naming convention: ")
+        file_naming = input("Enter a prefix naming convention: ")
         base_url, cookie = getVars()
-        testConnection(base_url, cookie, start)
-        recursivePDFDownload(base_url, cookie, naming, start, stop)
+        full_url = f'{base_url}{start:02}.pdf'
+        testConnection(full_url, cookie)
+        print(recursivePDFDownload(base_url, cookie, file_naming, start, stop))
