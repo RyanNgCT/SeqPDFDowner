@@ -52,7 +52,7 @@ def recursivePDFDownload(base_url: str, cookie: str, naming: str, start: int, st
                     hasher.update(chunk)
                 file_hash = hasher.hexdigest()
         except requests.exceptions.RequestException as e:
-            print(f'\nFailed to download file {naming}{file_index}.pdf. Error: {e}')
+            print(f'[-] Failed to download file {naming}{file_index}.pdf. Error: {e}')
             fail_count += 1
         else:
             line_to_print = f'{naming}{file_index} downloaded successfully. SHA256: {file_hash}'
@@ -60,7 +60,14 @@ def recursivePDFDownload(base_url: str, cookie: str, naming: str, start: int, st
             status_dict[i] = line_to_print
             success_count += 1
 
-    with open(os.path.join(download_dir + '/out.log'), 'w') as f:
+    base_filename = "out.log"
+    counter = 0
+    filename = base_filename
+    while os.path.exists(os.path.join(download_dir, filename)):
+        counter += 1
+        filename = f"{os.path.splitext(base_filename)[0]}.{counter}{os.path.splitext(base_filename)[1]}"
+
+    with open(os.path.join(download_dir, filename), 'w') as f:
         f.write('SeqPDFDowner by RyanNgCT (2024)\n')
         f.write(f'{success_count} files successfully downloaded.\n')
         if fail_count > 0:
