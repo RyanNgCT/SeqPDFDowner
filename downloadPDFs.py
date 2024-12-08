@@ -131,7 +131,7 @@ if __name__ == '__main__':
     try:
         indices = input("Enter start and stop indices to download (inclusive): ")
         start, stop = map(int, indices.split(','))  # Split input by comma and convert to ints
-        if start < 1:
+        if start <= -1:
             raise ValueError
     except ValueError:
         sys.exit("Invalid input. Run the program again!")
